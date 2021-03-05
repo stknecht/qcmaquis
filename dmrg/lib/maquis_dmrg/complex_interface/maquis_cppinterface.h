@@ -80,6 +80,7 @@
     // Run DMRG optimization
     void qcmaquis_interface_optimize();
 
+    // Returns the energy of the present (optimized) state
     V qcmaquis_interface_get_energy();
 
     // Get sweep statistics for the last sweep
@@ -94,5 +95,9 @@
     void qcmaquis_interface_get_2rdm(std::vector<std::pair<V,std::array<int,4>>> *rdm2);// BAGEL
     void qcmaquis_interface_get_2rdm(V *rdm2); // CQ
     void qcmaquis_interface_get_2rdm(dV *rdm2){}; // CQ
+
+    // Redirect stdout to file filename and restore it back
+    void qcmaquis_interface_stdout(const char* filename);
+    void qcmaquis_interface_restore_stdout();
 
 #endif
