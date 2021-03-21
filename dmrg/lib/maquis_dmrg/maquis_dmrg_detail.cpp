@@ -101,6 +101,19 @@ namespace maquis {
             parms.set("MAGNETIC", 1);
     }
 
+    // Set parameters required for relativistic calculations
+    void prepare_nucphys(BaseParameters& parms)
+    {
+        parms.set("symmetry", "u1np");
+        parms.set("LATTICE", "twofermions");
+        parms.set("CONSERVED_QUANTUMNUMBERS", "N");
+        parms.set("MODEL", "nuclear_physics");
+        parms.set("COMPLEX", "0");
+        parms.set("lattice_library", "coded");
+        parms.set("model_library", "coded");
+        parms.set("use_compressed", "0");
+    }
+
 // Transforms SU2 checkpoint to 2U1 checkpoint
 // Mostly copy-paste from mps_transform.cpp, but creates only one 2U1 checkpoint per state
 // corresponding to the state with the highest Sz
