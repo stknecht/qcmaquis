@@ -52,7 +52,8 @@ namespace symm_traits {
 
     template <>
     struct HasU1<U1DG> : public boost::true_type {};
-
+    template <>
+    struct HasU1<U1NP> : public boost::true_type {};
 
     template <class SymmGroup> 
     struct Has2U1 : public boost::false_type {};
@@ -82,6 +83,8 @@ namespace symm_traits {
     struct HasPG<SU2U1PG> : public boost::true_type {};
     template <>
     struct HasPG<U1DG> : public boost::true_type {};
+    template <>
+    struct HasPG<U1NP> : public boost::false_type {};
 
     // chemistry model implemented or not
 
@@ -98,6 +101,8 @@ namespace symm_traits {
     struct HasChemModel<SU2U1PG> : public boost::true_type {};
     template <>
     struct HasChemModel<U1DG> : public boost::true_type {};
+    template <>
+    struct HasChemModel<U1NP> : public boost::true_type {};
 
 }
 
