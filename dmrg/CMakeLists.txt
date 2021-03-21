@@ -40,7 +40,7 @@ endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 set (ALPS_SOURCE_DIR "alps")
 
 set(BUILD_SYMMETRIES "TwoU1PG;SU2U1PG" CACHE STRING "List of symmetry
-to include in the build objects. U1, TwoU1, TwoU1PG, NU1, Z2, SU2U1, SU2U1PG, U1DG and NONE are currently available.")
+to include in the build objects. U1, TwoU1, TwoU1PG, NU1, Z2, SU2U1, SU2U1PG, U1DG, U1NP and NONE are currently available.")
 set(DMRG_NUMSYMM 6 CACHE STRING "Maximum number of U1 symmetries.")
 option(ENABLE_OMP "Enable OpenMP" ON)
 # Disabled
@@ -126,6 +126,7 @@ macro(get_symm_suffix RET SYMM)
   string(REGEX REPLACE "^SU2U1$" "su2u1" ${RET} ${${RET}})
   string(REGEX REPLACE "^SU2U1PG$" "su2u1pg" ${RET} ${${RET}})
   string(REGEX REPLACE "^U1DG$" "u1dg" ${RET} ${${RET}})
+  string(REGEX REPLACE "^U1NP$" "u1np" ${RET} ${${RET}})
 endmacro(get_symm_suffix)
 
 macro(get_symm_group_name RET SYMM)
@@ -141,6 +142,7 @@ macro(get_symm_group_name RET SYMM)
   string(REGEX REPLACE "^SU2U1$" "SU2U1" ${RET} ${${RET}})
   string(REGEX REPLACE "^SU2U1PG$" "SU2U1PG" ${RET} ${${RET}})
   string(REGEX REPLACE "^U1DG$" "U1DG" ${RET} ${${RET}})
+  string(REGEX REPLACE "^U1NP$" "U1NP" ${RET} ${${RET}})
 endmacro(get_symm_group_name)
 
 macro(get_symm_files TYPE RET FILEBASE)
