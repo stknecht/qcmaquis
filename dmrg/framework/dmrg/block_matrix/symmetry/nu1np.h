@@ -44,7 +44,7 @@
 #include <dmrg/utils/BaseParameters.h>
 
 #include <dmrg/block_matrix/symmetry/nu1pg.h>
-#include <dmrg/block_matrix/symmetry/dg_tables.h>
+//#include <dmrg/block_matrix/symmetry/dg_tables.h>
 
 template<int N, class S>
 class NU1NP;
@@ -196,115 +196,17 @@ public:
         return ret;
     }
 
-    static void initialize_dg_table(BaseParameters & parms)
-    {
-        // read group_id from a parameter if it is set
-        if(parms.is_set("group_id"))
-        {
-            group_id = parms["group_id"];
-        }
-        else
-        {
-            // otherwise read it old-school from FCIDUMP
-            // open integral_file
-            std::string integral_file = parms["integral_file"];
-            std::ifstream integral_stream;
-            integral_stream.open(integral_file.c_str());
-            // get first line of integral_file
-            std::string line;
-            std::getline(integral_stream, line);
-            // split it
-            std::vector<std::string> split_line;
-            boost::split(split_line, line, boost::is_any_of("="));
-            std::string grp_str = *(--split_line.end());
-            // isolate group number and read it
-            boost::erase_all(grp_str,",");
-            std::istringstream iss(grp_str);
-            iss >> group_id;
-            // close integral_file
-            integral_stream.close();
-        }
-        set_dg_table();
-    }
-
-    static void set_dg_id(std::size_t group){
-        group_id = group;
-    }
-
-    static void set_dg_table(){
-        // set up multiplication table according to group_id (same numbering as in Dirac)
-        switch(group_id) {
-            // C2h, D2h
-            case 4:
-                max_irrep    = 8;
-                mult_table   = generate_mult_table_C2h<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_C2h<S>(max_irrep);
-                break;
-            // C2, D2, C2v, Cs
-            case 5:
-                max_irrep    = 4;
-                mult_table   = generate_mult_table_Cs_C2<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_Cs_C2<S>(max_irrep);
-                break;
-            // Cs --> group_ID = 5
-            case 6:
-                throw std::runtime_error("Double group Cs has ID = 5\n");
-            // Ci
-            case 7:
-                max_irrep    = 4;
-                mult_table   = generate_mult_table_Ci<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_Ci<S>(max_irrep);
-                break;
-            // C1
-            case 8:
-                max_irrep    = 4;
-                mult_table   = generate_mult_table_C1<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_C1<S>(max_irrep);
-                break;
-            // D2h spinfree
-            case 9:
-                throw std::runtime_error("D2h spinfree not implemented yet!\n");
-            // Cinfv (C2v + lin. symmetry) --> mapped to C64
-            case 10:
-                max_irrep    = 128;
-                mult_table   = generate_mult_table_C64<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_C64<S>(max_irrep);
-                break;
-            // Dinfh (D2h + lin. symmetry) --> mapped to C32h
-            case 11:
-                max_irrep    = 128;
-                mult_table   = generate_mult_table_C32h<S>(max_irrep);
-                adjoin_table = generate_adjoin_table_C32h<S>(max_irrep);
-                break;
-            default:
-                throw std::runtime_error("Double group not known!\nAvailable double groups are C1, Ci, C2h, D2h, C2, D2, C2v, Cs, Cinfv, Dinfh.\n");
-        }
-    }
 
     static subcharge const get_max_irrep()
     {
         return max_irrep;
     }
 
-    template<S> friend std::vector<S> default_dg_adjoin_table();
-    template<S> friend alps::numeric::matrix<S> default_dg_mult_table();
 };
 
-template<class S>
-std::vector<S> default_dg_adjoin_table()
-{
-	return std::vector<S>();
-}
-
-template<class S>
-alps::numeric::matrix<S> default_dg_mult_table()
-{
-    return alps::numeric::matrix<S>();
-}
-
 template<int N, class S> const typename NU1NP<N,S>::charge NU1NP<N,S>::IdentityCharge = typename NU1NP<N,S>::charge();
-template<int N, class S> alps::numeric::matrix<S> NU1NP<N,S>::mult_table = default_dg_mult_table<S>();
-template<int N, class S> std::vector<S> NU1NP<N,S>::adjoin_table = default_dg_adjoin_table<S>();
+//template<int N, class S> alps::numeric::matrix<S> NU1NP<N,S>::mult_table = default_dg_mult_table<S>();
+//template<int N, class S> std::vector<S> NU1NP<N,S>::adjoin_table = default_dg_adjoin_table<S>();
 template<int N, class S> std::size_t NU1NP<N,S>::group_id = 0;
 template<int N, class S> typename NU1NP<N,S>::subcharge NU1NP<N,S>::max_irrep = 0;
 
