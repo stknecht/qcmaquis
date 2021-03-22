@@ -26,8 +26,8 @@
  *
  *****************************************************************************/
 
-#ifndef REL_QC_MODEL_H
-#define REL_QC_MODEL_H
+#ifndef NUC_PHYS_MODEL_H
+#define NUC_PHYS_MODEL_H
 
 #include <cmath>
 #include <sstream>
@@ -49,7 +49,7 @@
 #include "dmrg/utils/checks.h"
 
 template<class Matrix, class SymmGroup>
-class rel_qc_model : public model_impl<Matrix, SymmGroup>
+class nuc_phys_model : public model_impl<Matrix, SymmGroup>
 {
     typedef model_impl<Matrix, SymmGroup> base;
 
@@ -68,7 +68,7 @@ class rel_qc_model : public model_impl<Matrix, SymmGroup>
 
 public:
 
-    rel_qc_model(Lattice const & lat_, BaseParameters & parms_);
+    nuc_phys_model(Lattice const & lat_, BaseParameters & parms_);
 
     void create_terms();
 
@@ -387,6 +387,6 @@ private:
 
 };
 
-#include "dmrg/models/chem/rel/model.hpp"
+#include "dmrg/models/nucphys/uncoupled/model.hpp"
 
 #endif

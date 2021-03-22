@@ -175,7 +175,8 @@ public:
 
     static subcharge adjoin(subcharge I)
     {
-        return adjoin_table[I];
+        //return adjoin_table[I];
+        return I;
     }
 
     static subcharge particleNumber(charge rhs) { return std::accumulate(rhs.begin(), &rhs[N], 0); }
@@ -202,10 +203,18 @@ public:
         return max_irrep;
     }
 
+    template<S> friend alps::numeric::matrix<S> default_np_mult_table();
+
 };
 
+template<class S>
+alps::numeric::matrix<S> default_np_mult_table()
+{
+    return alps::numeric::matrix<S>();
+}
+
 template<int N, class S> const typename NU1NP<N,S>::charge NU1NP<N,S>::IdentityCharge = typename NU1NP<N,S>::charge();
-//template<int N, class S> alps::numeric::matrix<S> NU1NP<N,S>::mult_table = default_dg_mult_table<S>();
+template<int N, class S> alps::numeric::matrix<S> NU1NP<N,S>::mult_table = default_np_mult_table<S>();
 //template<int N, class S> std::vector<S> NU1NP<N,S>::adjoin_table = default_dg_adjoin_table<S>();
 template<int N, class S> std::size_t NU1NP<N,S>::group_id = 0;
 template<int N, class S> typename NU1NP<N,S>::subcharge NU1NP<N,S>::max_irrep = 0;

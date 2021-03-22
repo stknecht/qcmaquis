@@ -26,17 +26,15 @@
  *
  *****************************************************************************/
 
-#ifndef REL_QC_MODEL_HPP
-#define REL_QC_MODEL_HPP
+#ifndef NUC_PHYS_MODEL_HPP
+#define NUC_PHYS_MODEL_HPP
 
 template <class Matrix, class SymmGroup>
-rel_qc_model<Matrix, SymmGroup>::rel_qc_model(Lattice const & lat_, BaseParameters & parms_)
+nuc_phys_model<Matrix, SymmGroup>::nuc_phys_model(Lattice const & lat_, BaseParameters & parms_)
 : lat(lat_)
 , parms(parms_)
 , tag_handler(new table_type())
 {
-    // Initialize double group table
-    SymmGroup::initialize_dg_table(parms);
 
 	// A -> empty, B -> occupied
     typename SymmGroup::charge A(0), B(0);
@@ -96,7 +94,7 @@ rel_qc_model<Matrix, SymmGroup>::rel_qc_model(Lattice const & lat_, BaseParamete
 }
 
 template <class Matrix, class SymmGroup>
-void rel_qc_model<Matrix, SymmGroup>::create_terms()
+void nuc_phys_model<Matrix, SymmGroup>::create_terms()
 {
     chem::detail::RelChemHelper<Matrix, SymmGroup> term_assistant(parms, lat, ident, fill, tag_handler);
     std::vector<value_type> & matrix_elements = term_assistant.getMatrixElements();
