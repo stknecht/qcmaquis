@@ -87,6 +87,9 @@ namespace dmrg {
 #ifdef HAVE_U1DG
         maquis::cout << "u1dg ";
 #endif
+#ifdef HAVE_U1NP
+        maquis::cout << "u1np ";
+#endif
 #ifdef HAVE_TwoU1
         maquis::cout << "2u1 ";
 #endif
@@ -121,6 +124,10 @@ namespace dmrg {
 #ifdef HAVE_U1DG
         else if (symm_name == "u1dg")
             ret.reset(new typename TR::template F<U1DG>::type(args...));
+#endif
+#ifdef HAVE_U1NP
+        else if (symm_name == "u1np")
+            ret.reset(new typename TR::template F<U1NP>::type(args...));
 #endif
 #ifdef HAVE_TwoU1
         else if (symm_name == "2u1")

@@ -76,6 +76,18 @@ namespace detail {
     };
 
     template <>
+    struct qn_helper<U1NP>
+    {
+        U1NP::charge total_qn(BaseParameters & parms)
+        {
+            U1NP::charge ret(0);
+            ret[0] = parms["nprotons"];
+            ret[1] = parms["nneutrons"];
+            return ret;
+        }
+    };
+
+    template <>
     struct qn_helper<SU2U1>
     {
         SU2U1::charge total_qn(BaseParameters & parms)
