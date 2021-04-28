@@ -32,9 +32,13 @@
 #include <string>
 #include <array>
 #include "../maquis_dmrg.h"
+#include "dmrg/utils/stdout_redirector.hpp"
 
 std::unique_ptr<maquis::DMRGInterface<std::complex<double>> > cpp_interface_ptr;
 DmrgParameters cpp_parms;
+// stdout redirector
+maquis::StdoutRedirector cpp_stdout_redirect;
+
 
     typedef std::complex<double> V;
     void qcmaquis_interface_preinit(int nel_, int L_, int irrep_,
@@ -291,4 +295,14 @@ integral_indices[i][3]};
         *truncated_fraction = 0; for (auto&& tf_ : tf_vec) *truncated_fraction += boost::any_cast<V>(tf_);
         *smallest_ev = 0; for (auto&& ev_ : ev_vec) *smallest_ev += boost::any_cast<V>(ev_);
         *nsweeps = cpp_interface_ptr->get_last_sweep();
+    }
+
+    void qcmaquis_interface_stdout(const char* filename)
+    {
+        cpp_stdout_redirect.set_filename(filename);
+    }
+
+    void qcmaquis_interface_restore_stdout()
+    {
+        cpp_stdout_redirect.restore();
     }
