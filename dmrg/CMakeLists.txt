@@ -142,7 +142,7 @@ macro(get_symm_group_name RET SYMM)
   string(REGEX REPLACE "^SU2U1$" "SU2U1" ${RET} ${${RET}})
   string(REGEX REPLACE "^SU2U1PG$" "SU2U1PG" ${RET} ${${RET}})
   string(REGEX REPLACE "^U1DG$" "U1DG" ${RET} ${${RET}})
-  string(REGEX REPLACE "^NucU1U1$" "nucu1u1" ${RET} ${${RET}})
+  string(REGEX REPLACE "^NucU1U1$" "NucU1U1" ${RET} ${${RET}})
 endmacro(get_symm_group_name)
 
 macro(get_symm_files TYPE RET FILEBASE)

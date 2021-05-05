@@ -75,6 +75,9 @@ namespace maquis {
     // Set parameters required for relativistic calculation
     void prepare_relativistic(BaseParameters& parms, bool magnetic = false);
 
+    // Set parameters required for nuclear physics calculation
+    void prepare_nucphys(BaseParameters& parms);
+
     // Transforms SU2 checkpoint to 2U1 checkpoint
     void transform(const std::string & pname, int state, int Ms=0);
 

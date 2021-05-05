@@ -122,6 +122,10 @@ namespace dmrg {
         else if (symm_name == "u1dg")
             ret.reset(new typename TR::template F<U1DG>::type(args...));
 #endif
+#ifdef HAVE_nucu1u1
+        else if (symm_name == "nucu1u1")
+            ret.reset(new typename TR::template F<NucU1U1>::type(args...));
+#endif
 #ifdef HAVE_TwoU1
         else if (symm_name == "2u1")
             ret.reset(new typename TR::template F<TwoU1>::type(args...));
