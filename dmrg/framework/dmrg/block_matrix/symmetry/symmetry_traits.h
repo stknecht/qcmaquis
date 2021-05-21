@@ -31,7 +31,7 @@
 
 namespace symm_traits {
 
-    // abelian vs. non-abelian
+    // abelian vs. non-abelian - make sure that NucU1U1 is Abelian
 
     class AbelianTag {};
     class SU2Tag {};
@@ -71,7 +71,7 @@ namespace symm_traits {
     template <>
     struct HasSU2<SU2U1PG> : public boost::true_type {};
 
-    // point group vs. no point group
+    // point group vs. no point group - used in pg_util.h!
 
     template <class SymmGroup>
     struct HasPG : public boost::false_type {}; 
@@ -82,9 +82,10 @@ namespace symm_traits {
     struct HasPG<SU2U1PG> : public boost::true_type {};
     template <>
     struct HasPG<U1DG> : public boost::true_type {};
+    template <>
+    struct HasPG<NucU1U1> : public boost::true_type {};
 
-    // chemistry model implemented or not
-
+    // chemistry model implemented or not - only needed for check of availability of the HF init guess
     template <class SymmGroup>
     struct HasChemModel : public boost::false_type {};
 
@@ -98,6 +99,8 @@ namespace symm_traits {
     struct HasChemModel<SU2U1PG> : public boost::true_type {};
     template <>
     struct HasChemModel<U1DG> : public boost::true_type {};
+    template <>
+    struct HasChemModel<NucU1U1> : public boost::false_type {};
 
 }
 
