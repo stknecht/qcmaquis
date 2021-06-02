@@ -24,7 +24,8 @@ add_library(qcmaquis-hdf5-interface ${HDF5_INTERFACE_SOURCES})
 
 target_link_libraries(qcmaquis-hdf5-interface ${HDF5_LIBRARIES})
 
-set_target_properties(qcmaquis-driver PROPERTIES COMPILE_FLAGS "-cpp")
+target_compile_options(qcmaquis-driver PRIVATE "-cpp")
+set_source_files_properties(hdf5_utils.f90 PROPERTIES COMPILE_FLAGS "-cpp")
 
 if ("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU"
        AND CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 10.0)

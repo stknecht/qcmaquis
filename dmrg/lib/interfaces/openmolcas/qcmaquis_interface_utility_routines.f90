@@ -220,7 +220,7 @@ contains
 
       subroutine file_name_generator(iroot, prototype_name, suffix, generated_name)
           implicit none
-          integer(kind=8), intent(in)                :: iroot
+          integer        , intent(in)        :: iroot
           character(len=*), intent(in)       :: prototype_name
           character(len=*), intent(in)       :: suffix
           character(len=2300), intent(inout) :: generated_name
