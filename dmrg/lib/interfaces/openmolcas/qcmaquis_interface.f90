@@ -740,7 +740,8 @@ module qcmaquis_interface
         hf_guess_string=""
         do ii=1,qcmaquis_param%L
           ! Construct a comma-separated string with all occupations
-          hf_guess_string=trim(hf_guess_string)//trim(str(int(dmrg_orbital_space%initial_occ(ii,i),kind=8)))
+          !hf_guess_string=trim(hf_guess_string)//trim(str(int(dmrg_orbital_space%initial_occ(ii,i),kind=8)))
+          hf_guess_string=trim(hf_guess_string)//trim(str(int(dmrg_orbital_space%initial_occ(ii,i))))
           if ((ii.ne.qcmaquis_param%L)) then
             hf_guess_string=trim(hf_guess_string)//","
           end if
