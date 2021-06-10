@@ -693,10 +693,12 @@ module qcmaquis_interface
 !  1st dimension: state-specific RDM flattened into 1D in OpenMOLCAS format
 !  2nd dimension: root
 ! entanglement: (optional, boolean) -- whether entanglement should be calculated and saved into HDF5 file
-  subroutine qcmaquis_interface_run_dmrg(nstates, d1, d2, spd, entanglement)
+! target_state: optimize MPS and compute RDMs (if requested) for a target state.
+  subroutine qcmaquis_interface_run_dmrg(nstates, d1, d2, spd, entanglement, target_state)
     integer, intent(in) :: nstates
     real*8, intent(inout), optional :: d1(:,:), d2(:,:), spd(:,:)
     logical, intent(in), optional :: entanglement
+    integer, intent(in), optional :: target_state
     integer :: i, ii, nsweeps_prev
     integer :: nsweeps, m
     real*8 :: truncated_weight, truncated_fraction, smallest_ev
@@ -731,7 +733,14 @@ module qcmaquis_interface
         call qcmaquis_interface_remove_param("MEASURE[1spdm]");
     end if
 
-    do i=1,nstates
+    istart = 1
+    iend   = nstates
+    if(present(target_state))then
+      istart = target_state
+      iend   = target_state
+    end if
+
+    do i=istart,iend
       ! Save the QCMaquis checkpoint name in the MOLCAS rasscf/dmrgscf.h5 file
       dmrg_file%qcmaquis_checkpoint_file(i)=trim(qcmaquis_param%project_name)//'.checkpoint_state.'// &
         trim(str(i-1))//".h5"
@@ -769,10 +778,19 @@ module qcmaquis_interface
       call qcmaquis_interface_get_iteration_results(nsweeps, m, truncated_weight, &
                                                     truncated_fraction, smallest_ev)
 
-      ! get RDMs
-      if (present(d1)) call qcmaquis_interface_get_1rdm_compat(d1(:,i))
-      if (present(d2)) call qcmaquis_interface_get_2rdm_compat(d2(:,i))
-      if (present(spd)) call qcmaquis_interface_get_spdm_compat(spd(:,i))
+      ii = i
+      if(present(target_state)) ii = 1
+
+#ifdef _soMPSoo_
+      if (present(d1)) call qcmaquis_interface_get_1rdm_full(d1=d1(:,ii))
+      if (present(d2)) call qcmaquis_interface_get_2rdm_full(d2=d2(:,ii),symmetrize=.false.)
+      !if (present(spd)) call qcmaquis_interface_get_spdm_compat(spd(:,ii))
+#else
+      ! get RDMs - OpenMolcas path...
+      if (present(d1)) call qcmaquis_interface_get_1rdm_compat(d1(:,ii))
+      if (present(d2)) call qcmaquis_interface_get_2rdm_compat(d2(:,ii))
+      if (present(spd)) call qcmaquis_interface_get_spdm_compat(spd(:,ii))
+#endif
 
       ! save number of sweeps
       dmrg_energy%num_sweeps(i) = nsweeps-nsweeps_prev
@@ -909,8 +927,9 @@ module qcmaquis_interface
   end subroutine
 
   ! Get 2-RDM and save it into an 4-dimensional array. (Used by NEVPT2)
-  subroutine qcmaquis_interface_get_2rdm_full(d2)
-    real*8, intent(inout) :: d2(:,:,:,:)
+  subroutine qcmaquis_interface_get_2rdm_full(d2,symmetrize)
+    real*8, intent(inout)        :: d2(:,:,:,:)
+    logical,intent(in), optional :: symmetrize
     integer(c_int) :: sz ! size
 
     ! indices and values that are obtained from QCMaquis interface
@@ -920,8 +939,12 @@ module qcmaquis_interface
     integer :: vv,ii ! counters for values and indices
     integer :: ij,jk,kl,li
     integer :: i,j,k,l,ijkl
+    logical :: Lsymmetrize
     ! temporary rdms
     real*8, allocatable :: rdm2(:,:,:,:)
+
+    Lsymmetrize = .true.
+    if(present(symmetrize)) Lsymmetrize = symmetrize
     nact = qcmaquis_param%L
     ! calculate the size of 2-RDM in QCMaquis
     ! TODO: this should be of the value n2*(n2+1)/2 with n2=nact*(nact+1)/2
@@ -965,19 +988,22 @@ module qcmaquis_interface
     end do
 
     ! now symmetrise the RDM for compatibility with MOLCAS (copy-paste from old interface)
-    do i=1,nact
-      do j=1,nact
-        do k=1,nact
-          do l=1,nact
-            if(j.eq.k)then
-              d2(i,j,k,l)=rdm2(i,j,k,l)
-            else
-              d2(i,j,k,l)=rdm2(i,j,k,l)+rdm2(i,k,j,l)
-            end if
-          end do
+    ! DANGEROUS: the interface should not assume OpenMolcas to be the only host program...
+    if(Lsymmetrize)then
+        do i=1,nact
+            do j=1,nact
+                do k=1,nact
+                    do l=1,nact
+                        if(j.eq.k)then
+                            d2(i,j,k,l)=rdm2(i,j,k,l)
+                        else
+                            d2(i,j,k,l)=rdm2(i,j,k,l)+rdm2(i,k,j,l)
+                        end if
+                    end do
+                end do
+            end do
         end do
-      end do
-    end do
+    end if
 
     if (allocated(values)) deallocate(values)
     if (allocated(indices)) deallocate(indices)
