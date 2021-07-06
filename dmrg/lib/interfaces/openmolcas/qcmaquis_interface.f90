@@ -701,6 +701,7 @@ module qcmaquis_interface
     integer, intent(in), optional :: target_state
     integer :: i, ii, nsweeps_prev
     integer :: nsweeps, m
+    integer :: iend, istart
     real*8 :: truncated_weight, truncated_fraction, smallest_ev
     logical :: hf_guess ! Check if we have a HF guess
     character(len=512) :: hf_guess_string
@@ -1003,6 +1004,8 @@ module qcmaquis_interface
                 end do
             end do
         end do
+    else
+      call dcopy(nact**4,rdm2,1,d2,1)
     end if
 
     if (allocated(values)) deallocate(values)
