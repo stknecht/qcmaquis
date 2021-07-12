@@ -115,7 +115,8 @@ module qcmaquis_interface
                                         myrank,    &        ! MPI rank
 #endif
                                         initial_occ,&       ! Initial HF occupation (optional)
-                                        sweep_m    &
+                                        sweep_m,    &
+                                        reinit      &
                                         )
       interface
         subroutine qcmaquis_interface_init_c(nel, L, spin, irrep, site_types, conv_thresh, &
@@ -141,6 +142,7 @@ module qcmaquis_interface
                      m, & ! bond dimension (if sweep_m is not used)
                  nsweeps  ! number of sweeps
         integer(c_int), dimension(:), optional, intent(in), target :: sweep_m ! list of m if several m values are desired
+        logical, OPTIONAL :: reinit
 
         ! Parameters from old initialize_dmrg
         integer, intent(in) :: nroots, lroot
@@ -170,49 +172,55 @@ module qcmaquis_interface
         integer :: i, j, n
 
         integer :: ierr
+        logical :: local_init
         ! Copy-paste from old initialize_dmrg
+
+        local_init = .true.
+        if(present(reinit))  local_init = reinit
 
             !> Threshold for energy
         E_threshold = thre
 
-
-
         dmrg_symmetry%nirrep = nsym
 
-        allocate(dmrg_state%iroot(lroot), stat=ierr); if( ierr /= 0 )stop ' Error in allocation: iroot(:)'
-        allocate(dmrg_state%weight(lroot), stat=ierr); if( ierr /= 0 )stop ' Error in allocation: weight(:)'
+        ierr = 0;
+        if(local_init)then
+          if(.not.allocated(dmrg_state%iroot))&
+          allocate(dmrg_state%iroot(lroot), stat=ierr); if( ierr /= 0 )stop ' Error in allocation: iroot(:)'
+          if(.not.allocated(dmrg_state%weight))&
+          allocate(dmrg_state%weight(lroot), stat=ierr); if( ierr /= 0 )stop ' Error in allocation: weight(:)'
 
-        dmrg_state    = type_state             (                                &
-                                                irrep,                    &
-                                                nel,                  &
-                                                spin,                 &
-                                                nroots,                  &
-                                                lroot,                 &
-                                                iroot(1:lroot), &
-                                                weight(1:lroot) &
-                                              )
+          dmrg_state    = type_state             (                                &
+                                                  irrep,                    &
+                                                  nel,                  &
+                                                  spin,                 &
+                                                  nroots,                  &
+                                                  lroot,                 &
+                                                  iroot(1:lroot), &
+                                                  weight(1:lroot) &
+                                                )
 
-        allocate(dmrg_orbital_space%initial_occ(L,lroot), stat=ierr); if( ierr /= 0 ) &
-        stop ' Error in allocation: initial_occ(:,:)'
-        dmrg_orbital_space = type_orbital_space(L_per_sym, initial_occ)
+          allocate(dmrg_orbital_space%initial_occ(L,lroot), stat=ierr); if( ierr /= 0 ) &
+          stop ' Error in allocation: initial_occ(:,:)'
+          dmrg_orbital_space = type_orbital_space(L_per_sym, initial_occ)
 
-        allocate(dmrg_energy%dmrg_state_specific(lroot), stat=ierr); if( ierr /= 0 ) &
-        stop ' Error in allocation: dmrg_state_specific(:)'
-        dmrg_energy%dmrg_state_specific = 0.0d0
+          allocate(dmrg_energy%dmrg_state_specific(lroot), stat=ierr); if( ierr /= 0 ) &
+          stop ' Error in allocation: dmrg_state_specific(:)'
+          dmrg_energy%dmrg_state_specific = 0.0d0
 
-        allocate(dmrg_energy%num_sweeps(lroot), stat=ierr); if( ierr /= 0 ) &
-        stop ' Error in allocation: num_sweeps(:)'
-        dmrg_energy%num_sweeps     = 0
+          allocate(dmrg_energy%num_sweeps(lroot), stat=ierr); if( ierr /= 0 ) &
+          stop ' Error in allocation: num_sweeps(:)'
+          dmrg_energy%num_sweeps     = 0
 
-        allocate(dmrg_energy%max_truncW(lroot), stat=ierr); if( ierr /= 0 ) &
-        stop ' Error in allocation: max_truncW(:)'
-        dmrg_energy%max_truncW     = 0
+          allocate(dmrg_energy%max_truncW(lroot), stat=ierr); if( ierr /= 0 ) &
+          stop ' Error in allocation: max_truncW(:)'
+          dmrg_energy%max_truncW     = 0
 
-        allocate(dmrg_file%qcmaquis_checkpoint_file(lroot), stat=ierr); if( ierr /= 0 ) &
-        stop ' Error in allocation: qcmaquis_checkpoint_file(:)'
-        dmrg_file%qcmaquis_checkpoint_file = ''
+          allocate(dmrg_file%qcmaquis_checkpoint_file(lroot), stat=ierr); if( ierr /= 0 ) &
+          stop ' Error in allocation: qcmaquis_checkpoint_file(:)'
+          dmrg_file%qcmaquis_checkpoint_file = ''
 
-
+        end if
         !> initialize parallel settings from the host program
 #ifdef _MOLCAS_MPP_
         dmrg_host_program_settings%nprocs = nprocs

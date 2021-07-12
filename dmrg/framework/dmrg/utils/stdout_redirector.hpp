@@ -67,7 +67,7 @@ namespace maquis
             {
                 out_.close();
                 out_.clear();
-                out_.open(filename);
+                out_.open(filename, std::ofstream::out | std::ofstream::app);
                 std::cout.rdbuf(out_.rdbuf());
             }
         private:
